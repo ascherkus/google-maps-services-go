@@ -346,11 +346,20 @@ type commonResponse struct {
 	ErrorMessage string `json:"error_message"`
 }
 
+type CommonError struct {
+	Status  string
+	Message string
+}
+
+func (e *CommonError) Error() string {
+	return fmt.Sprintf("maps: %s - %s", e.Status, e.Message)
+}
+
 // StatusError returns an error if this object has a Status different
 // from OK or ZERO_RESULTS.
 func (c *commonResponse) StatusError() error {
 	if c.Status != "OK" && c.Status != "ZERO_RESULTS" {
-		return fmt.Errorf("maps: %s - %s", c.Status, c.ErrorMessage)
+		return &CommonError{Status: c.Status, Message: c.ErrorMessage}
 	}
 	return nil
 }
